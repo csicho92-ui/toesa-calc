@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>퇴사 계산기 | 취업준비 몇 개월 버틸 수 있을까</title>
+<meta name="description" content="취업준비 몇 개월 버틸 수 있을까? 일부러 불리하게 계산해서 '최소한 이만큼'을 알려주는 퇴사 계산기. 입력한 내용은 수집하지 않아요.">
+<meta name="theme-color" content="#2347C5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232347C5'/%3E%3Crect x='6' y='13' width='4' height='8' rx='1' fill='%23FFE14D'/%3E%3Crect x='12' y='13' width='4' height='8' rx='1' fill='%23FFE14D'/%3E%3Crect x='18' y='13' width='4' height='8' rx='1' fill='%23FFE14D'/%3E%3Crect x='24' y='13' width='3' height='8' rx='1' fill='%23ffffff' opacity='.4'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://csicho92-ui.github.io/toesa-calc/">
+<!-- 블로그·메신저 링크 미리보기 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="퇴사 계산기">
+<meta property="og:title" content="퇴사 계산기 | 취업준비 몇 개월 버틸 수 있을까">
+<meta property="og:description" content="취업준비 몇 개월 버틸 수 있을까? 일부러 불리하게 계산해서 '최소한 이만큼'을 알려주는 퇴사 계산기. 입력한 내용은 수집하지 않아요.">
+<meta property="og:url" content="https://csicho92-ui.github.io/toesa-calc/">
+<meta property="og:image" content="https://csicho92-ui.github.io/toesa-calc/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one narrow column like a bank-app statement — inputs on top, a "runway" strip of calendar months as the hero result, then scenarios, warnings, AI handoff. */
+:root{
+  --paper:#F2F4F7; --card:#FFFFFF; --ink:#16202A; --sub:#5A6673; --line:#D9E0E7; --soft:#E9EDF2;
+  --accent:#2347C5; --accent-ink:#FFFFFF; --marker:#FFE14D;
+  --ok:#1E7A4C; --warn:#A35F00; --risk:#C2410C; --stop:#B4232A; --none:#7A8591;
+  --f-display:"Do Hyeon","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F151B; --card:#17202A; --ink:#E7ECF1; --sub:#95A2AF; --line:#2A3542; --soft:#1F2934;
+  --accent:#8FA8FF; --accent-ink:#0F151B; --marker:rgba(255,212,0,.32);
+  --ok:#5CC48C; --warn:#F0A94B; --risk:#F2804F; --stop:#F06B6B; --none:#8894A0; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0F151B; --card:#17202A; --ink:#E7ECF1; --sub:#95A2AF; --line:#2A3542; --soft:#1F2934;
+  --accent:#8FA8FF; --accent-ink:#0F151B; --marker:rgba(255,212,0,.32);
+  --ok:#5CC48C; --warn:#F0A94B; --risk:#F2804F; --stop:#F06B6B; --none:#8894A0; color-scheme:dark;}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+img{max-width:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{text-wrap:balance;margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+
+/* header */
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--sub);font-weight:500}
+h1{font-family:var(--f-display);font-weight:400;font-size:44px;line-height:1.1;letter-spacing:-.01em}
+.lede{color:var(--sub);margin:6px 0 0}
+.privacy{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.privacy svg{flex:none;margin-top:2px;color:var(--ok)}
+.privacy b{display:block}
+.privacy ul{margin:4px 0 0;padding-left:18px;color:var(--sub);font-size:13.5px}
+
+/* sections */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.panel h2{font-size:17px;font-weight:700}
+.hint{font-size:13px;color:var(--sub);margin:0}
+.seg{display:grid;gap:6px;background:var(--soft);padding:4px;border-radius:10px}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+.seg.two{grid-template-columns:repeat(2,1fr)}
+.seg button{font:inherit;font-size:14px;border:0;border-radius:7px;padding:9px 4px;background:transparent;color:var(--sub);cursor:pointer;line-height:1.3}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.linkbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.sample{font-size:12.5px;background:var(--marker);color:var(--ink);padding:2px 8px;border-radius:4px}
+
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+legend{font-weight:700;font-size:14.5px;padding:0;margin-bottom:8px}
+.legend-note{font-weight:400;color:var(--sub);font-size:12.5px;margin-left:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:13px;color:var(--sub)}
+.inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:0 10px}
+.inp:focus-within{border-color:var(--accent)}
+.inp input,.inp select{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-family:var(--f-num);font-size:15px;color:var(--ink);padding:9px 0;outline:none;text-align:right}
+.inp select{text-align:left;font-family:var(--f-body)}
+.inp.text input{text-align:left;font-family:var(--f-body)}
+.inp span{font-size:12.5px;color:var(--sub);margin-left:6px;white-space:nowrap}
+.check{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--sub)}
+.divider{height:1px;background:var(--line)}
+
+
+/* sliders */
+.slides{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 20px}
+.slide{display:flex;flex-direction:column;gap:2px;min-width:0}
+.slide-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.slide-top label{font-size:13px;color:var(--sub);min-width:0}
+.slide-top output{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:600;font-size:15px;white-space:nowrap}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0;cursor:pointer;--p:0%}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(to right,var(--accent) var(--p),var(--soft) var(--p))}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(to right,var(--accent) var(--p),var(--soft) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--card);border:2px solid var(--accent);margin-top:-9px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--accent)}
+input[type=range]:disabled{opacity:.4}
+.more{border-top:1px solid var(--line);padding-top:12px}
+.more-body{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+
+/* result hero */
+.result-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#fff;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.badge.v-ok{background:var(--ok)} .badge.v-warn{background:var(--warn)} .badge.v-risk{background:var(--risk)} .badge.v-stop{background:var(--stop)} .badge.v-none{background:var(--none)}
+:root[data-theme="dark"] .badge{color:#0F151B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .badge{color:#0F151B}}
+.big{font-family:var(--f-display);font-size:64px;line-height:1;display:inline-block;padding:0 6px;background:linear-gradient(transparent 58%,var(--marker) 58%,var(--marker) 92%,transparent 92%)}
+.big small{font-size:26px;margin-left:2px}
+.facts{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.facts li{display:flex;gap:10px;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line);padding-top:8px;flex-wrap:wrap}
+.facts li span:first-child{color:var(--sub);font-size:13.5px}
+.facts li b{font-weight:700;text-align:right}
+.headline{margin:0;font-size:15.5px}
+
+/* runway strip */
+.strip-wrap{display:flex;flex-direction:column;gap:6px}
+.strip{display:flex;gap:2px;height:30px}
+.cell{flex:1;border-radius:3px;background:var(--soft);position:relative;min-width:0}
+.cell.on{background:var(--fill,var(--accent))}
+.cell.target::after{content:"";position:absolute;right:-2px;top:-6px;bottom:-6px;width:2px;background:var(--ink)}
+.ticks{display:flex;gap:2px}
+.ticks span{flex:1;min-width:0;font-size:10.5px;color:var(--sub);text-align:center;white-space:nowrap;overflow:visible}
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub)}
+.legend-row i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+/* scenarios */
+.sc{display:flex;flex-direction:column;gap:0}
+.sc-item{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.sc-item:first-child{border-top:0;padding-top:0}
+.sc-name{font-weight:700;font-size:14.5px;min-width:0}
+.sc-right{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.sc-months{font-family:var(--f-num);font-weight:600;white-space:nowrap}
+.sc-note{grid-column:1/-1;font-size:12.5px;color:var(--sub);min-width:0}
+.mini{grid-column:1/-1;height:6px;background:var(--soft);border-radius:3px;position:relative}
+.mini i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.mini b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+
+/* warnings */
+.warn-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.warn-list li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.dot{width:8px;height:8px;border-radius:50%;margin-top:8px;background:var(--warn)}
+.dot.hi{background:var(--stop)}
+.warn-text{min-width:0}
+.chip{grid-column:2;justify-self:start;font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);text-decoration:none;color:var(--accent)}
+.chip.off{color:var(--sub);border-style:dashed}
+
+details{border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:700;font-size:14px}
+.calc{margin:10px 0 0;padding:12px;background:var(--paper);border-radius:8px;font-family:var(--f-num);font-size:12.5px;line-height:1.75;white-space:pre-wrap;overflow-x:auto}
+
+/* AI handoff */
+.purpose{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.purpose button{font:inherit;font-size:13.5px;text-align:left;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:10px;cursor:pointer;line-height:1.35}
+.purpose button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);font-weight:700}
+textarea{width:100%;min-height:160px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font-family:var(--f-num);font-size:12px;line-height:1.6;padding:10px}
+.primary{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:10px;padding:13px;background:var(--accent);color:var(--accent-ink);cursor:pointer;width:100%}
+.ai-links{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ai-links a{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);border-radius:10px;padding:10px 4px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;background:var(--card)}
+.ai-links a span{font-weight:400;font-size:11.5px;color:var(--sub)}
+.toast{font-size:13px;color:var(--ok);min-height:1.2em;margin:0}
+.notice{font-size:12.5px;color:var(--sub);background:var(--paper);border-radius:8px;padding:10px 12px;margin:0}
+
+.blog{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.blog small{display:block;color:var(--sub);font-size:12.5px}
+.blog b{font-size:15px}
+.blog .arrow{color:var(--accent);font-size:20px}
+footer{font-size:12px;color:var(--sub);text-align:center;line-height:1.7}
+@media (prefers-reduced-motion:no-preference){.cell{transition:background .2s}}
+@media (max-width:380px){h1{font-size:38px}.big{font-size:54px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">첫 취준생 · 퇴사 고민 중인 직장인 모두</div>
+    <h1>퇴사 계산기</h1>
+    <p class="lede">통장 잔고만 보고 세면 생각보다 빨리 바닥나요. 이 계산기는 일부러 불리하게 계산해서 "최소한 이만큼은 버틴다"를 알려줘요.</p>
+  </header>
+
+  <section class="privacy" aria-label="개인정보 안내">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+    <div>
+      <b>입력한 내용은 수집하지 않아요</b>
+      <ul>
+        <li>계산은 지금 보고 있는 화면 안에서만 이뤄져요.</li>
+        <li>입력값을 서버로 보내거나 어디에도 저장하지 않아요.</li>
+        <li>창을 닫거나 새로고침하면 모두 사라져요.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- INPUT -->
+  <section class="panel" aria-labelledby="in-title">
+    <div class="row">
+      <h2 id="in-title">내 상황 입력</h2>
+      <span class="sample" id="sampleTag">예시 값이 들어 있어요</span>
+    </div>
+
+    <div class="field">
+      <label id="lbl-status">지금 나는</label>
+      <div class="seg three" role="group" aria-labelledby="lbl-status">
+        <button type="button" data-status="first" aria-pressed="false">첫 취업준비</button>
+        <button type="button" data-status="quit" aria-pressed="false">퇴사 후 구직 중</button>
+        <button type="button" data-status="employed" aria-pressed="true">재직 중<br>퇴사 고민</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label id="lbl-mode">진단 방식</label>
+      <div class="seg two" role="group" aria-labelledby="lbl-mode">
+        <button type="button" data-mode="simple" aria-pressed="false">간편 (1분)</button>
+        <button type="button" data-mode="detail" aria-pressed="true">상세 (정확)</button>
+      </div>
+      <p class="hint" id="modeHint"></p>
+    </div>
+
+    <div class="row">
+      <p class="hint"><b>통장 금액처럼 정확한 숫자만</b> 직접 입력하고, 나머지는 밀어서 대충 맞추면 돼요.</p>
+      <button type="button" class="linkbtn" id="clearBtn">모두 지우기</button>
+    </div>
+
+    <fieldset>
+      <legend>기본</legend>
+      <div class="field"><label for="job">희망 직군</label><div class="inp"><select id="job">
+        <option value="">아직 미정</option><option>개발</option><option>디자인</option><option selected>마케팅</option><option>기획·PM</option><option>영업</option><option>경영지원·인사</option><option>생산·엔지니어</option><option>서비스·판매</option><option>공공·교육</option><option>기타</option>
+      </select></div></div>
+      <div class="slide" data-id="expect" data-label="예상 취업 소요기간" data-min="1" data-max="24" data-step="1" data-value="4" data-unit="개월" data-keep="1"></div>
+    </fieldset>
+
+    <!-- SIMPLE -->
+    <fieldset data-mode-only="simple">
+      <legend>돈 상황</legend>
+      <div class="grid">
+        <div class="field"><label for="s_cash">현금·예금·적금 합계</label><div class="inp"><input id="s_cash" inputmode="decimal" value="1200"><span>만 원</span></div></div>
+        <div class="field"><label for="s_invest">주식·코인 등 투자자산</label><div class="inp"><input id="s_invest" inputmode="decimal" value="1000"><span>만 원</span></div></div>
+      </div>
+      <div class="slide" data-id="s_spend" data-label="한 달에 쓰는 돈 (월세 포함 전부)" data-min="50" data-max="500" data-step="5" data-value="195" data-unit="만 원"></div>
+    </fieldset>
+
+    <!-- DETAIL: typed, exact numbers -->
+    <fieldset data-mode-only="detail">
+      <legend>통장에 있는 돈 <span class="legend-note">직접 입력</span></legend>
+      <div class="grid">
+        <div class="field"><label for="d_cash">현금·예금 (받은 퇴직금 포함)</label><div class="inp"><input id="d_cash" inputmode="decimal" value="1200"><span>만 원</span></div></div>
+        <div class="field"><label for="d_saving">해지 가능한 적금</label><div class="inp"><input id="d_saving" inputmode="decimal" value=""><span>만 원</span></div></div>
+        <div class="field"><label for="d_invest">투자자산 평가액</label><div class="inp"><input id="d_invest" inputmode="decimal" value="1000"><span>만 원</span></div></div>
+      </div>
+    </fieldset>
+
+    <fieldset data-mode-only="detail">
+      <legend>매달 나가는 고정비</legend>
+      <div class="grid">
+        <div class="field"><label for="d_house">주거비 (월세·관리비)</label><div class="inp"><input id="d_house" inputmode="decimal" value="60"><span>만 원</span></div></div>
+        <div class="field"><label for="d_loan">대출 상환</label><div class="inp"><input id="d_loan" inputmode="decimal" value="20"><span>만 원</span></div></div>
+      </div>
+      <div class="slides">
+        <div class="slide" data-id="d_tel" data-label="통신비" data-min="0" data-max="20" data-step="1" data-value="7" data-unit="만 원"></div>
+        <div class="slide" data-id="d_ins" data-label="보험료" data-min="0" data-max="50" data-step="1" data-value="10" data-unit="만 원"></div>
+        <div class="slide" data-id="d_sub" data-label="구독료 (OTT·앱 등)" data-min="0" data-max="20" data-step="1" data-value="3" data-unit="만 원"></div>
+        <div class="slide" data-id="d_etc" data-label="기타 고정비" data-min="0" data-max="100" data-step="5" data-value="0" data-unit="만 원"></div>
+        <div>
+          <div class="slide" data-id="d_health" data-label="건강보험료 (퇴사 후 기준)" data-min="0" data-max="40" data-step="1" data-value="10" data-unit="만 원"></div>
+          <label class="check"><input type="checkbox" id="d_health_unknown"> 잘 모르겠어요</label>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset data-mode-only="detail">
+      <legend>생활비 <span class="legend-note">대충 맞춰도 돼요</span></legend>
+      <div class="slides">
+        <div class="slide" data-id="d_food" data-label="식비" data-min="0" data-max="150" data-step="5" data-value="45" data-unit="만 원"></div>
+        <div class="slide" data-id="d_trans" data-label="교통비" data-min="0" data-max="50" data-step="1" data-value="10" data-unit="만 원"></div>
+        <div class="slide" data-id="d_life" data-label="기타 생활비 (쇼핑·모임 등)" data-min="0" data-max="150" data-step="5" data-value="15" data-unit="만 원"></div>
+        <div class="slide" data-id="d_job_m" data-label="취업준비 비용 (강의·학원 등)" data-min="0" data-max="100" data-step="5" data-value="15" data-unit="만 원"></div>
+      </div>
+    </fieldset>
+
+    <!-- EMPLOYED -->
+    <fieldset data-status-only="employed">
+      <legend>재직 중이라면</legend>
+      <div class="grid">
+        <div class="field"><label for="e_sev">예상 퇴직금</label><div class="inp"><input id="e_sev" inputmode="decimal" value="800"><span>만 원</span></div></div>
+        <div class="field"><label for="e_reason">퇴사 사유</label><div class="inp"><select id="e_reason">
+          <option value="voluntary" selected>자발적 퇴사</option>
+          <option value="unknown">아직 모름</option>
+          <option value="layoff">권고사직</option>
+          <option value="contract">계약만료</option>
+        </select></div></div>
+      </div>
+      <div class="slides">
+        <div class="slide" data-id="e_saving" data-label="지금 월 저축 가능액" data-min="0" data-max="400" data-step="5" data-value="120" data-unit="만 원"></div>
+        <div class="slide" data-id="e_after" data-label="고려 중인 퇴사 시점" data-min="1" data-max="12" data-step="1" data-value="3" data-unit="개월 후" data-keep="1"></div>
+        <div class="slide" data-id="e_support" data-label="회사가 내주던 식대·교통비 등" data-min="0" data-max="50" data-step="1" data-value="0" data-unit="만 원" data-mode-only="detail"></div>
+      </div>
+    </fieldset>
+
+    <!-- OPTIONAL -->
+    <details class="more" data-mode-only="detail">
+      <summary>해당되는 사람만 <span class="legend-note">수입, 일회성 지출, 알바 시급</span></summary>
+      <div class="more-body">
+        <div class="slides">
+          <div class="slide" data-id="d_inc_conf" data-label="확정된 월 수입 (이미 받는 부업 등)" data-min="0" data-max="300" data-step="5" data-value="0" data-unit="만 원"></div>
+          <div class="slide" data-id="d_inc_unc" data-label="미확정 월 수입 (부모님 지원, 실업급여 예정 등)" data-min="0" data-max="300" data-step="5" data-value="0" data-unit="만 원"></div>
+          <div class="slide" data-id="d_wage" data-label="알바 예상 시급" data-min="10320" data-max="20000" data-step="100" data-value="10320" data-unit="원"></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label for="d_job_once">한 번 드는 준비 비용 (응시료 등)</label><div class="inp"><input id="d_job_once" inputmode="decimal" value=""><span>만 원</span></div></div>
+          <div class="field"><label for="d_card">카드 할부 남은 금액</label><div class="inp"><input id="d_card" inputmode="decimal" value=""><span>만 원</span></div></div>
+          <div class="field"><label for="d_big">1년 안에 예정된 큰 지출</label><div class="inp"><input id="d_big" inputmode="decimal" value=""><span>만 원</span></div></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- RESULT -->
+  <section class="panel" aria-labelledby="res-title" aria-live="polite">
+    <div class="result-head">
+      <div>
+        <h2 id="res-title" style="font-size:14px;color:var(--sub);font-weight:500">취업준비 가능 기간 <span id="resBasis"></span></h2>
+        <div class="big" id="bigMonths">-</div>
+      </div>
+      <span class="badge" id="verdictBadge">-</span>
+    </div>
+    <p class="headline" id="headline"></p>
+
+    <div class="strip-wrap" aria-hidden="true">
+      <div class="strip" id="strip"></div>
+      <div class="ticks" id="ticks"></div>
+      <div class="legend-row"><span><i id="legendFill"></i>버틸 수 있는 달</span><span><i style="background:var(--ink);width:2px"></i>목표 취업기간</span></div>
+    </div>
+
+    <ul class="facts" id="facts"></ul>
+
+    <details>
+      <summary>계산 과정 보기</summary>
+      <div class="calc" id="calc"></div>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="sc-title">
+    <h2 id="sc-title">경우의 수 비교</h2>
+    <div class="sc" id="scenarios"></div>
+  </section>
+
+
+  <!-- AI -->
+  <section class="panel" aria-labelledby="ai-title">
+    <div>
+      <h2 id="ai-title">AI에게 더 물어보기</h2>
+      <p class="hint">계산은 끝났어요. 결과를 복사해서 쓰시는 AI에 붙여넣으면, AI는 숫자를 다시 계산하지 않고 해석과 조언만 해줘요.</p>
+    </div>
+    <div class="purpose" id="purpose"></div>
+    <textarea id="prompt" readonly aria-label="AI에게 보낼 내용"></textarea>
+    <button type="button" class="primary" id="copyBtn">결과 복사하기</button>
+    <p class="toast" id="toast" role="status"></p>
+    <div class="ai-links">
+      <a href="https://gemini.google.com/app" target="_blank" rel="noopener">제미나이<span>Gemini</span></a>
+      <a href="https://chatgpt.com/" target="_blank" rel="noopener">챗GPT<span>ChatGPT</span></a>
+      <a href="https://claude.ai/new" target="_blank" rel="noopener">클로드<span>Claude</span></a>
+    </div>
+    <p class="notice">복사한 내용을 AI에 붙여넣으면 그 AI 서비스로 전달돼요. 이 계산기는 아무것도 보내지 않아요. 이름이나 계좌번호 같은 정보는 덧붙이지 마세요.</p>
+  </section>
+
+  <a class="blog" id="blogLink" href="https://blog.naver.com/whtndls5/224438774731" target="_blank" rel="noopener">
+    <span><small>만든 사람 이야기</small><b>이 계산기를 만든 이유 · 나 이제 보니 취준이 처음이네?</b></span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </a>
+
+  <footer>
+    입력한 숫자와 보수적 가정으로 낸 추정이며, 재무·법률 자문이 아니에요.<br>
+    알바 수입은 2026년 최저시급(10,320원) 기준이에요. 해마다 바뀌니 확인해 주세요.
+  </footer>
+</div>
+
+<script>
+/* ============ 설정: 블로그 글이 올라오면 null 대신 주소를 넣으세요 ============ */
+const BLOG = {
+  prologue: "https://blog.naver.com/whtndls5/224438774731",
+  unemployment: null, // 실업급여, 자발적 퇴사면 정말 못 받을까
+  health: null,       // 퇴사 후 건강보험료 확인하고 줄이는 법
+  parttime: null,     // 취준과 알바 병행하는 현실적인 방법
+  quitcheck: null,    // 퇴사 전에 꼭 해둘 체크리스트
+  spending: null,     // 취준 기간 고정비 줄이는 법
+  debt: null          // 취준 중 대출·할부 관리하는 법
+};
+const MIN_WAGE = 10320;   // 원, 2026년 최저시급 (해마다 갱신)
+const RULE = { invest: 0.65, varPad: 1.15, simplePad: 1.20, emergFixed: 3, emergSimple: 2, targetMul: 1.5, targetMin: 6, ptHours: 15, ftHours: 40, weeks: 4, wageHaircut: 0.9, ptExtra: 2 };
+/* ========================================================================= */
+
+const $ = id => document.getElementById(id);
+const state = { status: "employed", mode: "detail", purpose: "explain" };
+const V = { ok:"여유", warn:"주의", risk:"위험", stop:"즉시 수입 필요", none:"해당 없음" };
+const RANK = { stop:0, risk:1, warn:2, ok:3 };
+
+function n(id){ const el=$(id); if(!el) return 0; const v=parseFloat(String(el.value).replace(/[,\s]/g,"")); return isFinite(v)&&v>0 ? v : 0; }
+function r1(x){ return Math.round(x*10)/10; }
+function won(x){ return r1(x).toLocaleString("ko-KR",{maximumFractionDigits:1}) + "만 원"; }
+function months(x){ return x===Infinity ? "제한 없음" : x + "개월"; }
+function addMonths(k){ const d=new Date(); return new Date(d.getFullYear(), d.getMonth()+k, 1); }
+function ym(d){ return d.getFullYear()+"년 "+(d.getMonth()+1)+"월"; }
+function verdictOf(runway, target){
+  if(runway===null) return "none";
+  if(runway >= target+3) return "ok";
+  if(runway >= target) return "warn";
+  if(runway >= 3) return "risk";
+  return "stop";
+}
+function runwayOf(fund, net){ return net<=0 ? Infinity : Math.max(0, Math.floor(fund/net)); }
+
+function compute(){
+  const S = state.status, simple = state.mode==="simple", emp = S==="employed";
+  const expect = n("expect");
+  const target = Math.max(RULE.targetMin, Math.ceil((expect||0)*RULE.targetMul));
+  const wageIn = simple ? 0 : (n("d_wage") > MIN_WAGE ? n("d_wage") : 0);
+  const wage = wageIn || MIN_WAGE;
+  const pt = wage*RULE.ptHours*RULE.weeks*RULE.wageHaircut/10000;
+  const ft = wage*RULE.ftHours*RULE.weeks*RULE.wageHaircut/10000;
+  const calc = []; const R = { simple, emp, S, target, expect, wage, wageIn, pt, ft, calc };
+
+  if(simple){
+    const cash=n("s_cash"), inv=n("s_invest"), spend=n("s_spend");
+    R.F1 = cash + inv*RULE.invest;
+    R.F4 = spend*RULE.simplePad; R.F3 = null; R.F2 = null; R.jobM = 0;
+    R.inc = 0; R.unc = 0;
+    R.F5 = R.F4;
+    R.F6 = R.F4*RULE.emergSimple; R.F7 = 0;
+    calc.push(`F1 인정 자산 = ${r1(cash)} + ${r1(inv)} × 0.65 = ${won(R.F1)}`);
+    calc.push(`F4 월 지출(보수) = ${r1(spend)} × 1.2 = ${won(R.F4)}`);
+    calc.push(`F6 비상금 = 월 지출 × 2 = ${won(R.F6)}`);
+    R.items = [["한 달 지출(입력)", spend]];
+  } else {
+    const cash=n("d_cash"), sav=n("d_saving"), inv=n("d_invest");
+    R.F1 = cash + sav + inv*RULE.invest;
+    const healthUnknown = $("d_health_unknown").checked;
+    const fixedItems = [["주거비",n("d_house")],["통신비",n("d_tel")],["보험료",n("d_ins")],["대출 상환",n("d_loan")],["구독료",n("d_sub")],["기타 고정비",n("d_etc")],["건강보험료",healthUnknown?0:n("d_health")]];
+    const support = emp ? n("e_support") : 0;
+    if(support) fixedItems.push(["회사 지원 끊기는 항목",support]);
+    const fixed = fixedItems.reduce((a,b)=>a+b[1],0);
+    const varRaw = n("d_food")+n("d_trans")+n("d_life");
+    R.F2 = varRaw*RULE.varPad; R.F3 = fixed; R.jobM = n("d_job_m");
+    R.F4 = R.F3 + R.F2 + R.jobM;
+    R.inc = n("d_inc_conf"); R.unc = n("d_inc_unc");
+    R.F5 = R.F4 - R.inc;
+    R.F6 = R.F3*RULE.emergFixed;
+    R.F7 = n("d_job_once") + n("d_card") + n("d_big");
+    R.healthUnknown = healthUnknown; R.loan = n("d_loan"); R.card = n("d_card");
+    R.items = fixedItems.concat([["식비",n("d_food")],["교통비",n("d_trans")],["기타 생활비",n("d_life")],["취업준비 비용(월)",R.jobM]]);
+    calc.push(`F1 인정 자산 = ${r1(cash)} + ${r1(sav)} + ${r1(inv)} × 0.65 = ${won(R.F1)}`);
+    calc.push(`F2 변동비(보수) = ${r1(varRaw)} × 1.15 = ${won(R.F2)}`);
+    calc.push(`F3 월 고정비 = ${fixedItems.filter(x=>x[1]).map(x=>r1(x[1])).join(" + ")||0} = ${won(R.F3)}`);
+    calc.push(`F4 월 총지출 = ${r1(R.F3)} + ${r1(R.F2)} + ${r1(R.jobM)} = ${won(R.F4)}`);
+    calc.push(`F5 월 순지출 = ${r1(R.F4)} − 확정 수입 ${r1(R.inc)} = ${won(R.F5)}`);
+    calc.push(`F6 비상금 = 고정비 × 3 = ${won(R.F6)}`);
+    calc.push(`F7 일회성 차감 = ${won(R.F7)}`);
+  }
+  R.F8 = Math.max(0, R.F1 - R.F6 - R.F7);
+  R.runway = runwayOf(R.F8, R.F5);
+  if(simple){ calc.push(`F8 런웨이 자금 = ${r1(R.F1)} − ${r1(R.F6)} = ${won(R.F8)}`); }
+  else { calc.push(`F8 런웨이 자금 = ${r1(R.F1)} − ${r1(R.F6)} − ${r1(R.F7)} = ${won(R.F8)}`); }
+  calc.push(`F9 런웨이 = ${r1(R.F8)} ÷ ${r1(R.F5)} = ${R.F5>0 ? (R.F8/R.F5).toFixed(2)+" → "+R.runway+"개월 (버림)" : "수입이 지출보다 많음"}`);
+  calc.push(`F10 목표 취업기간 = ${r1(expect)} × 1.5 = ${r1(expect*1.5)} → ${target}개월 (올림, 최소 6개월)`);
+
+  let v = verdictOf(R.runway, target);
+  R.capped = false;
+  if(simple && v==="ok"){ v="warn"; R.capped = true; }
+  R.verdict = v;
+
+  // scenarios
+  const sc = [];
+  const ptRunway = runwayOf(R.F8, R.F5 - pt);
+  const ptTarget = target + RULE.ptExtra;
+  const ptNote = `알바 월 ${won(pt)} (${wageIn? "시급 "+wage.toLocaleString()+"원":"최저시급"} × 주 15시간 × 4주 × 0.9), 목표 기간 +2개월`;
+  if(emp){
+    const saving = n("e_saving"), N = Math.max(1, Math.round(n("e_after")) || 3), sev = n("e_sev");
+    sc.push({name:"A. 지금 바로 퇴사", runway:R.runway, target, note:"퇴직금 제외 기준", calc:`${r1(R.F8)} ÷ ${r1(R.F5)}`});
+    const bFund = R.F8 + saving*N;
+    sc.push({name:`B. ${N}개월 더 다니고 퇴사`, runway:runwayOf(bFund,R.F5), target, note:`월 ${won(saving)}씩 ${N}개월 더 모은다고 가정`, calc:`(${r1(R.F8)} + ${r1(saving)} × ${N}) ÷ ${r1(R.F5)}`});
+    sc.push({name:"C. 재직하며 이직 준비", runway:null, target:null, note:"재정상 가장 안전해요. 시간과 체력이 버틸 수 있는지 따져보세요."});
+    sc.push({name:"D. 지금 퇴사 + 주 15시간 알바", runway:ptRunway, target:ptTarget, note:ptNote, calc:`${r1(R.F8)} ÷ (${r1(R.F5)} − ${r1(pt)})`});
+    if(sev>0) sc.push({name:"참고. A + 퇴직금을 받으면", runway:runwayOf(R.F8+sev,R.F5), target, note:"퇴직금은 실제로 받은 뒤에만 계획에 넣으세요", ref:true, calc:`(${r1(R.F8)} + ${r1(sev)}) ÷ ${r1(R.F5)}`});
+    // 퇴사일 역산
+    const need = (target+3)*R.F5 - R.F8;
+    if(R.F5<=0 || need<=0) R.quitPlan = {k:0};
+    else if(saving>0) R.quitPlan = {k:Math.ceil(need/saving)};
+    else R.quitPlan = {k:null};
+    R.saving = saving; R.sev = sev;
+  } else {
+    sc.push({name:"S1. 지금처럼 준비", runway:R.runway, target, note:"알바 없이 모은 돈으로만", calc:`${r1(R.F8)} ÷ ${r1(R.F5)}`});
+    sc.push({name:"S2. 주 15시간 알바 병행", runway:ptRunway, target:ptTarget, note:ptNote, calc:`${r1(R.F8)} ÷ (${r1(R.F5)} − ${r1(pt)})`});
+    const save = ft - (R.F4 - R.jobM);
+    const need = (target+3)*R.F5 - R.F8;
+    let s3;
+    if(R.F5<=0 || need<=0) s3 = {name:"S3. 풀타임 알바로 먼저 모으기", runway:null, target:null, verdictText:"필요 없음", note:"지금 자금으로 이미 목표 기간 + 3개월을 버틸 수 있어요."};
+    else if(save<=0) s3 = {name:"S3. 풀타임 알바로 먼저 모으기", runway:null, target:null, verdictText:"지출 조정 먼저", note:`풀타임 월 ${won(ft)}으로도 생활비를 넘기 어려워요. 지출을 먼저 줄여야 해요.`, bad:true};
+    else { const k=Math.ceil(need/save); s3 = {name:"S3. 풀타임 알바로 먼저 모으기", runway:null, target:null, verdictText:`${k}개월 일하면 여유`, note:`풀타임 월 ${won(ft)}, 생활비 빼고 월 ${won(save)} 저축 → ${k}개월이면 '여유' 판정 (${ym(addMonths(k))}부터 준비 시작)`}; }
+    sc.push(s3);
+  }
+  if(!simple && R.unc>0){
+    sc.push({name:"참고. 미확정 수입이 들어오면", runway:runwayOf(R.F8, R.F5 - R.unc), target, note:`월 ${won(R.unc)}이 실제로 들어올 때만 해당`, ref:true, calc:`${r1(R.F8)} ÷ (${r1(R.F5)} − ${r1(R.unc)})`});
+  }
+  sc.forEach(s=>{ if(s.runway!==null && s.runway!==undefined){ s.v = verdictOf(s.runway, s.target); if(simple && s.v==="ok") s.v="warn"; } else s.v = s.verdictText ? (s.bad?"stop":"none") : "none"; });
+  R.sc = sc;
+
+  // dates
+  if(R.runway!==Infinity){
+    R.endDate = addMonths(R.runway);
+    R.lineDate = addMonths(Math.max(0, R.runway-3));
+  }
+
+  // warnings
+  const W = [];
+  const reason = $("e_reason").value;
+  if(emp && (reason==="voluntary"||reason==="unknown")) W.push({hi:true, t:"자발적 퇴사는 원칙적으로 실업급여를 받기 어려워요. 실업급여를 계획에 넣었다면 고용센터에서 받을 수 있는지 먼저 확인하세요.", link:"unemployment"});
+  if(emp && reason!=="voluntary" && reason!=="unknown") W.push({t:"권고사직·계약만료는 실업급여 대상일 수 있지만, 확정 전까지는 계산에 넣지 않았어요. 고용센터에서 조건을 확인하세요.", link:"unemployment"});
+  if(emp && R.sev>0) W.push({t:"판정은 퇴직금을 뺀 기준이에요. 퇴직금은 통장에 들어온 뒤에만 계산에 넣으세요.", link:"quitcheck"});
+  if((S==="quit"||emp) && (simple || R.healthUnknown)) W.push({t:"퇴사하면 건강보험이 지역가입자로 바뀌어 보험료가 새로 생길 수 있어요. 이번 계산에는 정확히 반영되지 않았어요. 국민건강보험공단에서 예상 보험료나 가족 피부양자 등록이 되는지 확인하세요.", link:"health"});
+  if(emp && simple) W.push({t:"간편 진단에는 회사에서 지원받던 식대·교통비 같은 항목이 빠져 있어요. 퇴사하면 그만큼 지출이 늘어나요.", link:"quitcheck"});
+  const refSc = sc.find(s=>s.ref && s.name.includes("미확정"));
+  if(refSc && R.verdict!=="none" && (RANK[refSc.v]-RANK[R.verdict])>=2) W.push({hi:true, t:"결과가 미확정 수입에 크게 기대고 있어요. 그 돈이 안 들어올 때를 기준으로 결정하세요.", link:null});
+  if(!simple && (R.loan>0 || R.card>0)) W.push({t:"대출이나 카드 할부가 있어요. 연체되면 신용에 영향이 있으니 돈이 바닥나기 전에 상환 계획을 세우세요.", link:"debt"});
+  if(R.verdict==="stop") W.push({hi:true, t:"지금은 취업준비만 하기보다 수입을 먼저 만드는 게 안전해요.", link:"parttime"});
+  if(simple) W.push({t:"간편 진단은 정보가 적어서 '여유' 판정을 주지 않아요. 퇴사처럼 큰 결정은 상세 진단으로 한 번 더 확인하세요.", link:null});
+  if(!wageIn) W.push({t:`알바 수입은 2026년 최저시급(${MIN_WAGE.toLocaleString()}원) 기준이에요. 올해 최저시급을 확인하세요.`, link:"parttime"});
+  if(!expect) W.push({hi:true, t:"예상 취업 소요기간을 비워둬서 최소 기준 6개월로 계산했어요.", link:null});
+  R.warnings = W;
+  return R;
+}
+
+/* ---------- render ---------- */
+const VCLASS = {ok:"v-ok",warn:"v-warn",risk:"v-risk",stop:"v-stop",none:"v-none"};
+const VCOLOR = {ok:"var(--ok)",warn:"var(--warn)",risk:"var(--risk)",stop:"var(--stop)",none:"var(--none)"};
+function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+function badge(v, text){ const b=el("span","badge "+VCLASS[v], text||V[v]); return b; }
+
+let LAST = null;
+function render(){
+  const R = compute(); LAST = R;
+  $("resBasis").textContent = R.emp ? "· 지금 퇴사 기준" : "";
+  const big = $("bigMonths"); big.textContent = "";
+  if(R.runway===Infinity){ big.textContent="제한 없음"; }
+  else { big.append(String(R.runway)); const s=el("small",null,"개월"); big.append(s); }
+  const vb = $("verdictBadge"); vb.className = "badge "+VCLASS[R.verdict]; vb.textContent = V[R.verdict] + (R.capped ? " (상세 확인 필요)" : "");
+
+  let head;
+  const gap = R.runway===Infinity ? null : R.runway - R.target;
+  if(R.runway===Infinity) head = "확정 수입이 지출보다 많아서 모아둔 돈이 줄지 않아요.";
+  else if(R.verdict==="stop") head = `비상금을 빼면 ${R.runway}개월밖에 버티기 어려워요. 수입을 먼저 만드는 게 안전해요.`;
+  else if(gap<0) head = `목표 취업기간 ${R.target}개월보다 ${-gap}개월 짧아요.`;
+  else head = `목표 취업기간 ${R.target}개월을 버티고 ${gap}개월이 남아요.` + (R.capped ? " 간편 진단이라 상세 진단으로 확인이 필요해요." : "");
+  $("headline").textContent = head;
+
+  // strip
+  const strip=$("strip"), ticks=$("ticks"); strip.textContent=""; ticks.textContent="";
+  const rw = R.runway===Infinity ? R.target+6 : R.runway;
+  const total = Math.max(rw, R.target+3, 6) + 1;
+  const showEvery = total>18 ? 3 : total>10 ? 2 : 1;
+  for(let i=0;i<total;i++){
+    const c = el("div","cell"); c.style.setProperty("--fill", VCOLOR[R.verdict]);
+    if(i<rw) c.classList.add("on");
+    if(i===R.target-1) c.classList.add("target");
+    strip.append(c);
+    const d = addMonths(i+1);
+    const t = el("span", null, (i % showEvery===0) ? ((d.getMonth()===0||i===0) ? String(d.getFullYear()).slice(2)+"."+(d.getMonth()+1) : (d.getMonth()+1)+"월") : "");
+    ticks.append(t);
+  }
+  $("legendFill").style.background = VCOLOR[R.verdict];
+
+  // facts
+  const facts=$("facts"); facts.textContent="";
+  const add=(k,v)=>{ const li=el("li"); li.append(el("span",null,k), el("b",null,v)); facts.append(li); };
+  if(R.runway!==Infinity){
+    add(R.emp ? "지금 퇴사하면 버틸 수 있는 때" : "지금부터 버틸 수 있는 때", `${ym(R.endDate)}까지`);
+    add("알바 시작 마지노선", R.runway<=3 ? "지금 바로" : `${ym(R.lineDate)}`);
+  }
+  if(R.emp && R.quitPlan){
+    if(R.quitPlan.k===0) add("'여유' 판정까지", "지금도 충분해요");
+    else if(R.quitPlan.k===null) add("'여유' 판정까지", "저축 가능액을 입력하세요");
+    else add("'여유' 판정까지", `${R.quitPlan.k}개월 더 다니기 (${ym(addMonths(R.quitPlan.k))} 퇴사)`);
+  }
+  add("월 지출 (보수 적용)", won(R.F4));
+  add("비상금 (손대지 않을 돈)", won(R.F6));
+  $("calc").textContent = R.calc.join("\n") + "\n\n※ 알바 시작 마지노선 = 버틸 수 있는 때보다 3개월 앞선 달";
+
+  // scenarios
+  const scBox=$("scenarios"); scBox.textContent="";
+  const maxM = Math.max(...R.sc.map(s=> s.runway===Infinity? 0 : Math.max(s.runway||0, s.target||0)), 1) + 2;
+  R.sc.forEach(s=>{
+    const item=el("div","sc-item");
+    item.append(el("div","sc-name",s.name));
+    const right=el("div","sc-right");
+    if(s.runway!==null && s.runway!==undefined){ right.append(el("span","sc-months",months(s.runway)), badge(s.v)); }
+    else right.append(badge(s.v, s.verdictText||V.none));
+    item.append(right);
+    if(s.runway!==null && s.runway!==undefined){
+      const m=el("div","mini"); const f=el("i"); const w = s.runway===Infinity?100:Math.min(100, s.runway/maxM*100);
+      f.style.width=w+"%"; f.style.background=VCOLOR[s.v]; m.append(f);
+      if(s.target){ const b=el("b"); b.style.left=Math.min(100,s.target/maxM*100)+"%"; m.append(b); }
+      item.append(m);
+    }
+    item.append(el("div","sc-note", s.note + (s.target? ` · 목표 ${s.target}개월`:"")));
+    scBox.append(item);
+  });
+
+  renderPurpose(); buildPrompt();
+}
+
+/* ---------- AI prompt ---------- */
+const PURPOSES = () => {
+  const list = [
+    {id:"explain", label:"결과를 쉽게 설명해줘"},
+    {id:"spend", label:"지출 줄일 곳 찾아줘"},
+    {id:"parttime", label:"알바·취준 병행 계획 짜줘"}
+  ];
+  list.push(state.status==="employed" ? {id:"quit", label:"퇴사 시점 같이 고민해줘"} : {id:"family", label:"가족에게 설명할 말 정리해줘"});
+  return list;
+};
+function renderPurpose(){
+  const box=$("purpose"); box.textContent="";
+  const list = PURPOSES();
+  if(!list.find(p=>p.id===state.purpose)) state.purpose="explain";
+  list.forEach(p=>{
+    const b=el("button",null,p.label); b.type="button"; b.setAttribute("aria-pressed", String(p.id===state.purpose));
+    b.addEventListener("click",()=>{ state.purpose=p.id; renderPurpose(); buildPrompt(); });
+    box.append(b);
+  });
+}
+function buildPrompt(){
+  const R = LAST; if(!R) return;
+  const statusText = {first:"첫 취업준비", quit:"퇴사 후 구직 중", employed:"재직 중, 퇴사 고민"}[R.S];
+  const job = $("job").value;
+  const L = [];
+  L.push("[퇴사 계산기 결과]");
+  L.push(`- 상태: ${statusText}${job? " / 희망 직군: "+job : ""}`);
+  L.push(`- 진단 방식: ${R.simple?"간편":"상세"} (보수적 기준)`);
+  L.push(`- 판정: ${V[R.verdict]}${R.capped?" (간편 진단이라 상세 확인 필요)":""}`);
+  L.push(`- 취업준비 가능 기간: ${months(R.runway)}${R.runway!==Infinity? " ("+ym(R.endDate)+"까지)":""}${R.emp?" · 지금 퇴사 기준":""}`);
+  L.push(`- 목표 취업기간: ${R.target}개월 (본인 예상 ${r1(R.expect)}개월 × 1.5, 최소 6개월)`);
+  if(R.runway!==Infinity) L.push(`- 알바 시작 마지노선: ${R.runway<=3?"지금 바로":ym(R.lineDate)}`);
+  L.push(`- 월 총지출(보수 적용): ${won(R.F4)} / 월 순지출: ${won(R.F5)}`);
+  L.push(`- 런웨이 자금: ${won(R.F8)} / 비상금(별도 보관): ${won(R.F6)}`);
+  if(R.emp && R.quitPlan && R.quitPlan.k) L.push(`- '여유' 판정까지: ${R.quitPlan.k}개월 더 재직 필요 (월 저축 ${won(R.saving)} 기준)`);
+  L.push("- 지출 내역(입력값, 월):");
+  R.items.filter(x=>x[1]>0).forEach(x=>L.push(`  · ${x[0]}: ${won(x[1])}`));
+  L.push("- 경우의 수:");
+  R.sc.forEach(s=>L.push(`  · ${s.name}: ${s.runway!==null&&s.runway!==undefined ? months(s.runway)+" / 목표 "+s.target+"개월 / "+V[s.v] : (s.verdictText||V.none)} (${s.note})`));
+  if(R.warnings.length){ L.push("- 경고:"); R.warnings.forEach(w=>L.push("  · "+w.t)); }
+  L.push("");
+  L.push("[부탁]");
+  L.push("너는 취업준비생의 돈 문제를 함께 고민하는 상담가야. 아래 규칙을 꼭 지켜줘.");
+  L.push("1. 위 숫자는 계산기가 보수적 기준(투자자산 65%만 인정, 변동비 +15%, 비상금 별도, 미확정 수입·받지 않은 퇴직금 제외)으로 이미 계산한 값이야. 다시 계산하지 말고 그대로 써줘.");
+  L.push("2. 새로 계산해야 하면 식을 보여주고, 런웨이 개월 수는 소수점을 버려줘.");
+  L.push("3. 채용시장 통계, 실업급여·건강보험 같은 제도의 세부 조건처럼 확실하지 않은 정보는 추측하지 말고 '확인 필요'라고 한 뒤 어디서 확인하면 되는지 알려줘.");
+  L.push("4. 특정 주식·코인을 사거나 팔라는 조언은 하지 마.");
+  L.push("5. 쉬운 말로, 짧고 구체적으로 답해줘.");
+  const ask = {
+    explain:"이 결과가 무슨 뜻인지 3줄로 요약하고, 이번 주에 할 일 3가지를 우선순위대로 알려줘.",
+    spend:"지출 내역에서 줄일 수 있는 항목을 찾아 우선순위를 매겨줘. 항목마다 얼마를 줄이면 런웨이가 몇 개월 늘어나는지 계산해줘. (런웨이 = 런웨이 자금 ÷ 월 순지출, 소수점 버림)",
+    parttime:`주 15시간 알바와 취업준비를 병행하는 주간 계획을 짜줘. 취업준비 시간을 지키는 방법과, 희망 직군${job?"("+job+")":""}에 도움이 될 만한 알바 유형도 알려줘.`,
+    quit:"'지금 퇴사', '몇 개월 더 다니고 퇴사', '재직하며 준비' 중 무엇이 나을지 장단점을 표로 비교해줘. 결론을 대신 내리지 말고, 내가 스스로 판단할 수 있게 확인 질문을 해줘.",
+    family:"이 상황을 가족에게 설명할 때 쓸 수 있는 말을 정리해줘. 걱정을 줄이면서도 숫자는 솔직하게 전하는 방향으로, 3~5문장으로 써줘."
+  }[state.purpose];
+  L.push("");
+  L.push("요청: " + ask);
+  L.push("답변 끝에 대화를 이어갈 수 있게 나에게 질문을 1~2개 해줘.");
+  L.push("");
+  L.push("(퇴사 계산기 · blog.naver.com/whtndls5)");
+  $("prompt").value = L.join("\n");
+}
+
+
+/* ---------- sliders ---------- */
+function fmtSlide(v, unit){ return (unit==="원" ? Number(v).toLocaleString("ko-KR") : v) + (unit==="원"||unit==="만 원" ? (unit==="원"?"원":"만 원") : unit); }
+function paint(r){ const p=(r.value-r.min)/(r.max-r.min)*100; r.style.setProperty("--p", p+"%"); }
+document.querySelectorAll(".slide").forEach(s=>{
+  const d=s.dataset, top=el("div","slide-top"), lab=el("label",null,d.label), out=el("output");
+  lab.htmlFor=d.id;
+  const r=document.createElement("input"); r.type="range"; r.id=d.id; r.min=d.min; r.max=d.max; r.step=d.step; r.value=d.value;
+  out.htmlFor=d.id; out.textContent=fmtSlide(r.value,d.unit);
+  r.addEventListener("input",()=>{ out.textContent=fmtSlide(r.value,d.unit); paint(r); });
+  r.setResetValue = v => { r.value=v; out.textContent=fmtSlide(r.value,d.unit); paint(r); };
+  top.append(lab,out); s.append(top,r); paint(r);
+});
+
+/* ---------- events ---------- */
+function applyVisibility(){
+  document.querySelectorAll("[data-mode-only]").forEach(e=>{ e.hidden = e.dataset.modeOnly!==state.mode; });
+  document.querySelectorAll("[data-status-only]").forEach(e=>{ e.hidden = e.dataset.statusOnly!==state.status; });
+  document.querySelectorAll("[data-status]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.status===state.status)));
+  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.mode===state.mode)));
+  $("modeHint").textContent = state.mode==="simple"
+    ? "질문 몇 개로 빠르게 봐요. 정보가 적은 만큼 지출 +20%, 비상금 2개월치로 더 불리하게 계산하고 '여유' 판정은 주지 않아요."
+    : "항목별로 입력해서 정확하게 봐요. 퇴사처럼 큰 결정은 상세 진단을 권해요.";
+}
+document.querySelectorAll("[data-status]").forEach(b=>b.addEventListener("click",()=>{ state.status=b.dataset.status; applyVisibility(); render(); }));
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{ state.mode=b.dataset.mode; applyVisibility(); render(); }));
+document.addEventListener("input", e=>{ if(e.target.closest(".panel") && e.target.id!=="prompt"){ $("sampleTag").hidden = true; render(); } });
+document.addEventListener("change", e=>{ if(e.target.matches("select,input[type=checkbox]")){ $("sampleTag").hidden = true; render(); } });
+$("d_health_unknown").addEventListener("change", e=>{ $("d_health").disabled = e.target.checked; });
+$("clearBtn").addEventListener("click",()=>{
+  document.querySelectorAll(".panel .inp input").forEach(i=>{ i.value=""; });
+  document.querySelectorAll(".panel input[type=range]").forEach(r=>{ if(!r.closest(".slide").dataset.keep) r.setResetValue(r.min); });
+  $("d_health_unknown").checked=false; $("d_health").disabled=false;
+  $("sampleTag").hidden = true; render();
+});
+$("copyBtn").addEventListener("click",()=>{
+  const text=$("prompt").value, toast=$("toast");
+  const done=()=>{ toast.textContent="복사했어요. 아래에서 쓰시는 AI를 열고 붙여넣으세요."; };
+  const fallback=()=>{ const t=$("prompt"); t.focus(); t.select(); try{ document.execCommand("copy") ? done() : (toast.textContent="내용을 선택해 두었어요. 길게 눌러 복사하세요."); }catch(e){ toast.textContent="내용을 선택해 두었어요. 길게 눌러 복사하세요."; } };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done, fallback); } else fallback();
+});
+
+applyVisibility(); render();
+</script>
+</body>
+</html>
